@@ -1,0 +1,14 @@
+SELECT `doctor`.`DR_NAME`,
+    `doctor`.`USERNAME`,
+    `doctor`.`PASSWORD`,
+    `doctor`.`PHON_NO_1`,
+    `doctor`.`PHONE_NO_2`,
+    `doctor`.`MAIL`,
+    `doctor`.`ADDRESS`,
+    `doctor`.`CITIZEN_ID`,
+    `doctor`.`NMCID`,
+    `doctor`.`BLOOD_GROUP`,
+    `doctor`.`DEGREE`,
+    `doctor`.`SPECIALIZATION`,
+    `doctor`.`HOSPITAL`
+FROM `medify`.`doctor`;
