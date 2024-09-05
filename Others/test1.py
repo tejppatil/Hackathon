@@ -1,26 +1,13 @@
-import mysql.connector 
-mydb = mysql.connector.connect( 
-host = "localhost", 
-user = "root", 
-password = "pavan1", 
-database = "medify"
-) 
+import mysql.connector
 
-# a1 = mydb.cursor()
-# a1.execute("SELECT DR_NAME FROM doctor") 
-# aa1 = a1.fetchall()
-# for x in aa1:
-#   print(x)
+mydb = mysql.connector.connect(
+    host="localhost",
+    user="root",
+    password="pavan1",
+    database="medify"
+)
 
-
-# a2 = mydb.cursor() 
-# a2.execute("SELECT ADDRESS FROM hospital") 
-# aa2 = a2.fetchone() 
-# for x in aa2:
-#   print(x)
-
-
-class patient:
+class Patient:
     def __init__(self):
         self.patient_index = 0
 
@@ -44,13 +31,12 @@ class patient:
             elif choice == "2":
                 self.patient_signup()
             elif choice == "3":
-                print("\nExiting!\nExited Succesfully!\n")
+                print("\nExiting!\nExited Successfully!\n")
                 exit(1)
             else:
                 print("\nInvalid Choice!\n")
 
-
-    def patient_menu():
+    def patient_menu(self):
         while True:
             print("\n----------------------------")
             print("| 1. View your Profile       |")
@@ -64,54 +50,45 @@ class patient:
             choice = input()
 
             if choice == "1":
-                patient_viewyourprofile()
+                self.patient_viewyourprofile()
             elif choice == "2":
-                patient_viewnearbyhospitals()
-            # elif choice == "3":
-            #      patient_viewnearbypharmacies()
-            # elif choice == "4":
-            #     patient_medicinesearch()
-            # elif choice == "5":
-            #     print("\nExiting!\nExited Succesfully!\n")
-            #     exit(1)
+                self.patient_viewnearbyhospitals()
+            elif choice == "3":
+                # self.patient_viewnearbypharmacies()
+                pass
+            elif choice == "4":
+                self.patient_medicinesearch()
+            elif choice == "5":
+                print("\nExiting!\nExited Successfully!\n")
+                exit(1)
             else:
                 print("\nInvalid Choice!\n")
 
-
-    def patient_login():
+    def patient_login(self):
         print("\nEnter Username: ", end="")
         patient_username = input()
         print("Enter Password: ", end="")
         patient_password = input()
 
-        flag = 0
-
         a1 = mydb.cursor()
-        a1.execute("SELECT USERNAME FROM patient") 
-        aa1 = a1.fetchall()
+        a1.execute("SELECT USERNAME, PASSWORD FROM patient")
+        patients = a1.fetchall()
 
-        a2 = mydb.cursor()
-        a2.execute("SELECT PASSWORD FROM patient") 
-        aa2 = a2.fetchall()
+        for patient in patients:
+            if patient_username == patient[0] and patient_password == patient[1]:
+                print("\nLogin Successful!\n")
+                self.patient_index = patient[0]
+                self.patient_menu()
+                return
 
-        for i in aa1:
-            if patient_username == aa1 and patient_password == aa2:
-                print("\nLogin Successfull!\n")
-                patient_index = i
-                flag = 1
-                patient_menu()
-                break
+        print("\nInvalid Credentials!\n")
+        self.patient_homemenu()
 
-        if flag == 0:
-            print("\nInvalid Credentials!\n")
-            patient_homemenu()
-
-
-    def patient_signup():
+    def patient_signup(self):
         print("\nEnter your Name: ", end="")
         patient_name = input()
         print("Enter your phone number: ", end="")
-
+        
         while True:
             try:
                 patient_phone = int(input())
@@ -120,6 +97,7 @@ class patient:
                 print("Please enter a valid mobile number: ", end="")
 
         print("Enter your alternate [Emergency] phone number: ", end="")
+        patient_emergency_phone = input()
 
         print("Enter your mail Id: ", end="")
         patient_mail = input()
@@ -135,18 +113,25 @@ class patient:
         patient_password = input()
 
         a3 = mydb.cursor()
-        a3.execute("INSERT INTO TABLE patient VALUES (patient_name, patient_username, patient_password, patient_phone, random.randint(0, 100), patient_mail, patient_address, patient_bloodgroup, patient_citizenid)") 
-        aa3 = a3.fetchall()
+        query = ("INSERT INTO patient "
+                 "(NAME, USERNAME, PASSWORD, PHONE, EMERGENCY_PHONE, EMAIL, ADDRESS, BLOOD_GROUP, CITIZEN_ID) "
+                 "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)")
+        values = (patient_name, patient_username, patient_password, patient_phone, patient_emergency_phone, patient_mail, patient_address, patient_bloodgroup, patient_citizenid)
+        a3.execute(query, values)
+        mydb.commit()
 
-        print("\nSign Up Succesfull!\nVisit nearest hospital to complete KYC to acces all features of the app!\n")
-        patient_homemenu()
+        print("\nSign Up Successful!\nVisit the nearest hospital to complete KYC to access all features of the app!\n")
+        self.patient_homemenu()
 
-    def patient_viewyourprofile():
+    def patient_viewyourprofile(self):
         a4 = mydb.cursor()
-        a4.execute("SELECT * FROM PATIENT WHERE USERNAME = 'patient_username'") 
-        aa4 = a4.fetchall()
+        a4.execute(f"SELECT * FROM PATIENT WHERE USERNAME = '{self.patient_index}'")
+        profile = a4.fetchall()
+        
+        for data in profile:
+            print(data)
 
-    def patient_medicinesearch():
+    def patient_medicinesearch(self):
         hiarr = [["Fever", "Paracetamol"], ["Cold", "Ceterizine"], ["Stomach ache", "Cyclopam"], ["Headache", "Aspirin"], ["Back pain", "Hydrocodone"], ["Nausea", "Domperidone"]]
 
         print("\nWhich Symptom do you have:", end="")
@@ -156,27 +141,27 @@ class patient:
 
         try:
             choice = int(input())
-            if choice > 7:
+            if choice > 6:
                 print("\nInvalid Choice!\n")
-                patient_menu()
+                self.patient_menu()
                 return
             print("\nYou can take the following tablet for temporary relief. Consult a Doctor if symptoms persist.\n")
             print(hiarr[choice - 1][1], "\n")
         except ValueError:
             print("\nInvalid Choice!\n")
-            patient_menu()
+            self.patient_menu()
             return
 
-    def patient_viewnearbyhospitals():
+    def patient_viewnearbyhospitals(self):
         print("\nWhere do you live?")
         while True:
             print("\n----------------")
-            print("| 1. Dahegam     |")
+            print("| 1. Dahegam     |")
             print("| 2. Gandhinagar |")
-            print("| 3. Ahmedabad   |")
-            print("| 4. Surat       |")
-            print("| 5. Vadodara    |")
-            print("| 6. Exit        |")
+            print("| 3. Ahmedabad   |")
+            print("| 4. Surat       |")
+            print("| 5. Vadodara    |")
+            print("| 6. Exit        |")
             print("----------------")
             print("> ", end="")
 
@@ -198,13 +183,12 @@ class patient:
                     print("\nSunshine Global Hospital: \"Shop No 7, Om Complex, Vasna Rd, near Taksh Complex, Shivashraya Society, Tandalja, Vadodara, Gujarat 390015\"\n")
                     return
                 elif choice == 6:
-                    patient_menu()
+                    self.patient_menu()
                 else:
                     print("\nInvalid choice or few places are still left to update. Sorry for the inconvenience!\n")
                     return
             except ValueError:
                 print("\nInvalid choice!\n")
-
 
 def main():
     while True:
@@ -218,14 +202,14 @@ def main():
         choice = input("> ")
 
         if choice == "1":
-            p1 = patient()
+            p1 = Patient()
             p1.patient_start()
         # elif choice == "2":
         #     d1 = Doctor()
         #     d1.doctor_homemenu()
         # elif choice == "3":
         #     a1 = Admin()
-            #a1.admin_homemenu()
+        #     a1.admin_homemenu()
         elif choice == "4":
             print("\nExiting!\nExited Successfully!\n")
             break
