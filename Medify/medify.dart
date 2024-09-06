@@ -1319,65 +1319,66 @@ class MyDetailsPage extends StatelessWidget {
     );
   }
 }
-
 class PatientProfileVisitPage extends StatefulWidget {
   @override
   _PatientProfileVisitPageState createState() => _PatientProfileVisitPageState();
 }
 
 class _PatientProfileVisitPageState extends State<PatientProfileVisitPage> {
-  final _idNumberController = TextEditingController();
-  String _selectedIdType = 'Aadhaar Card'; // Default selection
+  final _documentNumberController = TextEditingController();
+  String _selectedDocumentType = 'Aadhaar Card'; // Default selection
 
   // Sample data for demonstration
-  final Map<String, Map<String, String>> _patientData = {
-    '123456': {
-      'name': 'Jane Doe',
-      'doctorName': 'Dr. John Doe',
-      'doctorAddress': '123 Main St',
+  final Map<String, Map<String, Map<String, String>>> _patientData = {
+    'Aadhaar Card': {
+      '123456789012': {
+        'name': 'Jane Doe',
+        'doctorName': 'Dr. John Doe',
+        'doctorAddress': '123 Main St',
+      },
+      '234567890123': {
+        'name': 'Robert Smith',
+        'doctorName': 'Dr. Emma Watson',
+        'doctorAddress': '456 Elm St',
+      },
+      // Add more Aadhaar Card entries if needed
     },
-    '654321': {
-      'name': 'John Smith',
-      'doctorName': 'Dr. Alice Brown',
-      'doctorAddress': '456 Elm St',
+    'PAN Card': {
+      'ABCDE1234F': {
+        'name': 'Alice Johnson',
+        'doctorName': 'Dr. Michael Lee',
+        'doctorAddress': '789 Maple Ave',
+      },
+      'XYZDE5678G': {
+        'name': 'David Wilson',
+        'doctorName': 'Dr. Linda Gray',
+        'doctorAddress': '101 Pine Rd',
+      },
+      // Add more PAN Card entries if needed
     },
+    'Passport': {
+      'P1234567': {
+        'name': 'Emily Davis',
+        'doctorName': 'Dr. Sarah Brown',
+        'doctorAddress': '202 Birch Blvd',
+      },
+      'P7654321': {
+        'name': 'James Taylor',
+        'doctorName': 'Dr. Chris Green',
+        'doctorAddress': '303 Oak St',
+      },
+      // Add more Passport entries if needed
+    },
+    // Add more documents and patient data as needed
   };
 
-  // Mock function to check if doctor is authorized
-  bool _isDoctorAuthorized() {
-    // Implement your logic here to verify the doctor's authentication
-    // For example, you might check if the doctor is logged in or has valid credentials
-    return true; // Assuming the doctor is always authorized for demo purposes
-  }
-
   void _retrievePatientInfo() {
-    if (!_isDoctorAuthorized()) {
-      // Show error if doctor is not authorized
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Authorization Error'),
-            content: Text('You are not authorized to access patient information.'),
-            actions: <Widget>[
-              TextButton(
-                child: Text('OK'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
-      );
-      return;
-    }
+    final documentType = _selectedDocumentType;
+    final documentNumber = _documentNumberController.text;
 
-    final idNumber = _idNumberController.text;
-
-    // Check if the ID number exists in the sample data
-    if (_patientData.containsKey(idNumber)) {
-      final patientInfo = _patientData[idNumber]!; // Get patient info
+    // Check if the document type and number exist in the sample data
+    if (_patientData[documentType]?.containsKey(documentNumber) ?? false) {
+      final patientInfo = _patientData[documentType]![documentNumber]!; // Get patient info
       final patientName = patientInfo['name']!;
       final doctorName = patientInfo['doctorName']!;
       final doctorAddress = patientInfo['doctorAddress']!;
@@ -1388,7 +1389,7 @@ class _PatientProfileVisitPageState extends State<PatientProfileVisitPage> {
           return AlertDialog(
             title: Text('Confirmation'),
             content: Text('$doctorName has accessed $patientName at $doctorAddress. Do you wish to continue?',
-                style: TextStyle(fontSize: 18, color: Colors.black)),
+                style: TextStyle(color: Colors.black)),
             actions: <Widget>[
               TextButton(
                 child: Text('Cancel'),
@@ -1414,13 +1415,13 @@ class _PatientProfileVisitPageState extends State<PatientProfileVisitPage> {
         },
       );
     } else {
-      // Show error if the ID number is not found
+      // Show error if the document number is not found
       showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
             title: Text('Error'),
-            content: Text('ID number not found. Please check the number and try again.'),
+            content: Text('Document number not found. Please check the number and try again.'),
             actions: <Widget>[
               TextButton(
                 child: Text('OK'),
@@ -1448,7 +1449,7 @@ class _PatientProfileVisitPageState extends State<PatientProfileVisitPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             DropdownButtonFormField<String>(
-              value: _selectedIdType,
+              value: _selectedDocumentType,
               items: <String>['Aadhaar Card', 'PAN Card', 'Passport']
                   .map<DropdownMenuItem<String>>((String value) {
                 return DropdownMenuItem<String>(
@@ -1458,22 +1459,22 @@ class _PatientProfileVisitPageState extends State<PatientProfileVisitPage> {
               }).toList(),
               onChanged: (String? newValue) {
                 setState(() {
-                  _selectedIdType = newValue!;
+                  _selectedDocumentType = newValue!;
                 });
               },
               decoration: InputDecoration(
                 filled: true,
                 fillColor: Colors.white, // Set the background color of the dropdown to white
-                labelText: 'Select ID Type',
+                labelText: 'Select Document Type',
                 border: OutlineInputBorder(),
               ),
             ),
             SizedBox(height: 16),
             TextField(
               style: TextStyle(color: Colors.black),
-              controller: _idNumberController,
+              controller: _documentNumberController,
               decoration: InputDecoration(
-                labelText: 'Enter ID Number',
+                labelText: 'Enter Document Number',
                 filled: true,
                 fillColor: Colors.white, // Set the background color of the input box to white
                 border: OutlineInputBorder(),
@@ -1481,7 +1482,7 @@ class _PatientProfileVisitPageState extends State<PatientProfileVisitPage> {
             ),
             SizedBox(height: 20),
             ElevatedButton(
-              onPressed: _idNumberController.text.isNotEmpty ? _retrievePatientInfo : null,
+              onPressed: _documentNumberController.text.isNotEmpty ? _retrievePatientInfo : null,
               child: Text('Search'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.teal, // Customize button color
