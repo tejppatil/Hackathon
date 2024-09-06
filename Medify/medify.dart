@@ -125,9 +125,51 @@ class HomePage extends StatelessWidget {
   }
 }
 
-class PatientLogin extends StatelessWidget {
+class PatientLogin extends StatefulWidget {
+  @override
+  _PatientLoginState createState() => _PatientLoginState();
+}
+
+class _PatientLoginState extends State<PatientLogin> {
   final TextEditingController patientIdController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+
+  // Define valid user credentials
+  final Map<String, String> validCredentials = {
+    'user123': 'password123',
+    'user456': 'password456',
+  };
+
+  void _login() {
+    final String userId = patientIdController.text;
+    final String password = passwordController.text;
+
+    if (validCredentials.containsKey(userId) && validCredentials[userId] == password) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => PatientHomePage()),
+      );
+    } else {
+      // Show an error message if the credentials are incorrect
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Login Failed'),
+            content: Text('Invalid User ID or Password. Please try again.'),
+            actions: <Widget>[
+              TextButton(
+                child: Text('OK'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -155,9 +197,7 @@ class PatientLogin extends StatelessWidget {
                   labelText: 'User ID',
                   border: OutlineInputBorder(),
                   fillColor: Colors.white, // Set input box background color
-
                   filled: true, // Enable background color
-
                 ),
               ),
               SizedBox(height: 16), // Add space between text fields
@@ -174,10 +214,7 @@ class PatientLogin extends StatelessWidget {
               ),
               SizedBox(height: 20),
               ElevatedButton(
-                onPressed: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => PatientHomePage()));
-                },
+                onPressed: _login,
                 child: Text('Login'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.white,
@@ -188,8 +225,12 @@ class PatientLogin extends StatelessWidget {
               SizedBox(height: 20),
               TextButton(
                 onPressed: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => SignupPage(userType: '',)));
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => SignupPage(userType: ''),
+                    ),
+                  );
                 },
                 child: Text('Don\'t have an account? Sign up'),
                 style: TextButton.styleFrom(
@@ -1064,9 +1105,48 @@ class DoctorLoginPage extends StatefulWidget {
   _DoctorLoginPageState createState() => _DoctorLoginPageState();
 }
 
+
+
 class _DoctorLoginPageState extends State<DoctorLoginPage> {
   final TextEditingController doctorIdController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+
+  // Define valid doctor credentials
+  final Map<String, String> validCredentials = {
+    'doctor123': 'password123',
+    'doctor456': 'password456',
+  };
+
+  void _login() {
+    final String doctorId = doctorIdController.text;
+    final String password = passwordController.text;
+
+    if (validCredentials.containsKey(doctorId) && validCredentials[doctorId] == password) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => DoctorDashboardPage()),
+      );
+    } else {
+      // Show an error message if the credentials are incorrect
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Login Failed'),
+            content: Text('Invalid Doctor ID or Password. Please try again.'),
+            actions: <Widget>[
+              TextButton(
+                child: Text('OK'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -1096,6 +1176,7 @@ class _DoctorLoginPageState extends State<DoctorLoginPage> {
                   fillColor: Colors.white, // Set the background color of the input box to white
                 ),
               ),
+              SizedBox(height: 16), // Add space between text fields
               TextField(
                 style: TextStyle(color: Colors.black),
                 controller: passwordController,
@@ -1108,15 +1189,27 @@ class _DoctorLoginPageState extends State<DoctorLoginPage> {
               ),
               SizedBox(height: 20),
               ElevatedButton(
+                onPressed: _login,
+                child: Text('Login'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white, // Customize button color
+                  padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                ),
+              ),
+              SizedBox(height: 20),
+              TextButton(
                 onPressed: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => DoctorDashboardPage(),
+                      builder: (context) => SignupPage(userType: ''),
                     ),
                   );
                 },
-                child: Text('Login'),
+                child: Text('Don\'t have an account? Sign up'),
+                style: TextButton.styleFrom(
+                  foregroundColor: Colors.white, // Customize text color
+                ),
               ),
             ],
           ),
@@ -1125,6 +1218,7 @@ class _DoctorLoginPageState extends State<DoctorLoginPage> {
     );
   }
 }
+
 
 class DoctorDashboardPage extends StatelessWidget {
   @override
@@ -1226,53 +1320,119 @@ class MyDetailsPage extends StatelessWidget {
   }
 }
 
-
-
 class PatientProfileVisitPage extends StatefulWidget {
   @override
   _PatientProfileVisitPageState createState() => _PatientProfileVisitPageState();
 }
 
 class _PatientProfileVisitPageState extends State<PatientProfileVisitPage> {
-  final _citizenIdController = TextEditingController();
+  final _idNumberController = TextEditingController();
+  String _selectedIdType = 'Aadhaar Card'; // Default selection
+
+  // Sample data for demonstration
+  final Map<String, Map<String, String>> _patientData = {
+    '123456': {
+      'name': 'Jane Doe',
+      'doctorName': 'Dr. John Doe',
+      'doctorAddress': '123 Main St',
+    },
+    '654321': {
+      'name': 'John Smith',
+      'doctorName': 'Dr. Alice Brown',
+      'doctorAddress': '456 Elm St',
+    },
+  };
+
+  // Mock function to check if doctor is authorized
+  bool _isDoctorAuthorized() {
+    // Implement your logic here to verify the doctor's authentication
+    // For example, you might check if the doctor is logged in or has valid credentials
+    return true; // Assuming the doctor is always authorized for demo purposes
+  }
 
   void _retrievePatientInfo() {
-    // Normally, you would retrieve patient info from a backend
-    final patientName = 'Jane Doe';
-    final doctorName = 'Dr. John Doe';
-    final doctorAddress = '123 Main St';
+    if (!_isDoctorAuthorized()) {
+      // Show error if doctor is not authorized
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Authorization Error'),
+            content: Text('You are not authorized to access patient information.'),
+            actions: <Widget>[
+              TextButton(
+                child: Text('OK'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+      return;
+    }
 
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Confirmation'),
-          content: Text('$doctorName has accessed $patientName at $doctorAddress. Do you wish to continue?',
-          style: TextStyle(color: Colors.black)),
-          actions: <Widget>[
-            TextButton(
-              child: Text('Cancel'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: Text('Continue'),
-              onPressed: () {
-                Navigator.of(context).pop();
-                // Navigate to medical history page
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => PatientMedicalHistoryPage(patientName: patientName),
-                  ),
-                );
-              },
-            ),
-          ],
-        );
-      },
-    );
+    final idNumber = _idNumberController.text;
+
+    // Check if the ID number exists in the sample data
+    if (_patientData.containsKey(idNumber)) {
+      final patientInfo = _patientData[idNumber]!; // Get patient info
+      final patientName = patientInfo['name']!;
+      final doctorName = patientInfo['doctorName']!;
+      final doctorAddress = patientInfo['doctorAddress']!;
+
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Confirmation'),
+            content: Text('$doctorName has accessed $patientName at $doctorAddress. Do you wish to continue?',
+                style: TextStyle(fontSize: 18, color: Colors.black)),
+            actions: <Widget>[
+              TextButton(
+                child: Text('Cancel'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+              TextButton(
+                child: Text('Continue'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  // Navigate to medical history page
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => PatientMedicalHistoryPage(patientName: patientName),
+                    ),
+                  );
+                },
+              ),
+            ],
+          );
+        },
+      );
+    } else {
+      // Show error if the ID number is not found
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Error'),
+            content: Text('ID number not found. Please check the number and try again.'),
+            actions: <Widget>[
+              TextButton(
+                child: Text('OK'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
   }
 
   @override
@@ -1280,32 +1440,53 @@ class _PatientProfileVisitPageState extends State<PatientProfileVisitPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Patient Profile Visit'),
-        backgroundColor: Colors.teal,
+        backgroundColor: Colors.teal, // Customize AppBar color
       ),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Colors.teal[200]!, Colors.teal[400]!],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-        ),
+      body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
+            DropdownButtonFormField<String>(
+              value: _selectedIdType,
+              items: <String>['Aadhaar Card', 'PAN Card', 'Passport']
+                  .map<DropdownMenuItem<String>>((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList(),
+              onChanged: (String? newValue) {
+                setState(() {
+                  _selectedIdType = newValue!;
+                });
+              },
+              decoration: InputDecoration(
+                filled: true,
+                fillColor: Colors.white, // Set the background color of the dropdown to white
+                labelText: 'Select ID Type',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            SizedBox(height: 16),
             TextField(
               style: TextStyle(color: Colors.black),
-              controller: _citizenIdController,
+              controller: _idNumberController,
               decoration: InputDecoration(
-                labelText: 'Enter Patient Citizen ID',
+                labelText: 'Enter ID Number',
                 filled: true,
                 fillColor: Colors.white, // Set the background color of the input box to white
+                border: OutlineInputBorder(),
               ),
             ),
             SizedBox(height: 20),
             ElevatedButton(
-              onPressed: _retrievePatientInfo,
-              child: Text('Retrieve Patient Info'),
+              onPressed: _idNumberController.text.isNotEmpty ? _retrievePatientInfo : null,
+              child: Text('Search'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.teal, // Customize button color
+                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              ),
             ),
           ],
         ),
@@ -1361,6 +1542,7 @@ class PatientMedicalHistoryPage extends StatelessWidget {
   }
 }
 
+
 class ShareExperiencePage extends StatefulWidget {
   @override
   _ShareExperiencePageState createState() => _ShareExperiencePageState();
@@ -1368,6 +1550,21 @@ class ShareExperiencePage extends StatefulWidget {
 
 class _ShareExperiencePageState extends State<ShareExperiencePage> {
   final TextEditingController _experienceController = TextEditingController();
+
+  final List<Map<String, String>> _dummyExperiences = [
+    {
+      'doctor': 'Dr. John Doe',
+      'experience': 'Today, I encountered a case of rare autoimmune disorder. The patient showed symptoms that were new to me. I will be researching further to understand this better and update my treatment methods.'
+    },
+    {
+      'doctor': 'Dr. Jane Smith',
+      'experience': 'I had a patient with an unusual reaction to a common antibiotic. This is a reminder of the importance of monitoring patient responses to medication closely.'
+    },
+    {
+      'doctor': 'Dr. Emily Clark',
+      'experience': 'Recently, I treated a case of severe dehydration due to an underlying condition that was not initially diagnosed. Early intervention is key in such cases.'
+    },
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -1394,12 +1591,11 @@ class _ShareExperiencePageState extends State<ShareExperiencePage> {
             ),
             SizedBox(height: 20),
             TextField(
-              style: TextStyle(color: Colors.black),
               controller: _experienceController,
               decoration: InputDecoration(
                 labelText: 'Share your experience',
                 filled: true,
-                fillColor: Colors.white, // Set the background color of the input box to white
+                fillColor: Colors.white,
               ),
               maxLines: 5,
             ),
@@ -1427,6 +1623,49 @@ class _ShareExperiencePageState extends State<ShareExperiencePage> {
               },
               child: Text('Submit'),
             ),
+            SizedBox(height: 20),
+            Text(
+              'Recent Experiences Shared by Doctors:',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold,color: Colors.black)
+            ),
+            SizedBox(height: 10),
+            Expanded(
+              child: ListView.builder(
+                itemCount: _dummyExperiences.length,
+                itemBuilder: (context, index) {
+                  return Container(
+                    margin: EdgeInsets.symmetric(vertical: 8.0),
+                    padding: EdgeInsets.all(16.0),
+                    decoration: BoxDecoration(
+                      color: Colors.white, // White background for posts
+                      borderRadius: BorderRadius.circular(8.0),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.2),
+                          spreadRadius: 2,
+                          blurRadius: 5,
+                          offset: Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(
+                          _dummyExperiences[index]['doctor']!,
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        SizedBox(height: 8),
+                        Text(
+                          _dummyExperiences[index]['experience']!,
+                          style: TextStyle(color: Colors.black),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ),
           ],
         ),
       ),
@@ -1434,9 +1673,51 @@ class _ShareExperiencePageState extends State<ShareExperiencePage> {
   }
 }
 
-class HospitalAdminLogin extends StatelessWidget {
+class HospitalAdminLogin extends StatefulWidget {
+  @override
+  _HospitalAdminLoginState createState() => _HospitalAdminLoginState();
+}
+
+class _HospitalAdminLoginState extends State<HospitalAdminLogin> {
   final TextEditingController userIdController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+
+  // Define valid admin credentials
+  final Map<String, String> validCredentials = {
+    'admin001': 'adminpass001',
+    'admin002': 'adminpass002',
+  };
+
+  void _login() {
+    final String userId = userIdController.text;
+    final String password = passwordController.text;
+
+    if (validCredentials.containsKey(userId) && validCredentials[userId] == password) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => HospitalAdminDashboard()),
+      );
+    } else {
+      // Show an error message if the credentials are incorrect
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Login Failed'),
+            content: Text('Invalid User ID or Password. Please try again.'),
+            actions: <Widget>[
+              TextButton(
+                child: Text('OK'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -1448,8 +1729,8 @@ class HospitalAdminLogin extends StatelessWidget {
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            begin: Alignment.topLeft,
             colors: [Colors.teal[100]!, Colors.teal[300]!],
+            begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
         ),
@@ -1478,13 +1759,27 @@ class HospitalAdminLogin extends StatelessWidget {
             ),
             SizedBox(height: 20),
             ElevatedButton(
+              onPressed: _login,
+              child: Text('Login'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.white, // Customize button color
+                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              ),
+            ),
+            SizedBox(height: 20),
+            TextButton(
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => HospitalAdminDashboard()),
+                  MaterialPageRoute(
+                    builder: (context) => SignupPage(userType: ''),
+                  ),
                 );
               },
-              child: Text('Login'),
+              child: Text('Don\'t have an account? Sign up'),
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.white, // Customize text color
+              ),
             ),
           ],
         ),
@@ -1492,7 +1787,6 @@ class HospitalAdminLogin extends StatelessWidget {
     );
   }
 }
-
 
 class CreateDoctorAccount extends StatelessWidget {
   final TextEditingController nameController = TextEditingController();
