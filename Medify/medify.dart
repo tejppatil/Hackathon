@@ -1,6 +1,7 @@
+import 'dart:async';
 import 'dart:math';
-
 import 'package:flutter/material.dart';
+//import 'dart:async';
 
 void main() {
   runApp(MedifyApp());
@@ -10,15 +11,48 @@ class MedifyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Medify - Keeps Every Record',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        textTheme: TextTheme(
-          bodyLarge: TextStyle(color: Colors.white),
-          bodyMedium: TextStyle(color: Colors.white),
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(primarySwatch: Colors.blue),
+      home: SplashScreen(), // SplashScreen is the initial page
+    );
+  }
+}
+
+class SplashScreen extends StatefulWidget {
+  @override
+  _SplashScreenState createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends State<SplashScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Delay to show the splash screen for 3 seconds
+    Timer(Duration(seconds: 4), () {
+      Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => HomePage()));
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.teal[300], // Customize this color as you like
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // App logo (replace with your image)
+            Icon(Icons.local_hospital, size: 100, color: Colors.white),
+            SizedBox(height: 20),
+            Text(
+              "Medify",
+              style: TextStyle(
+                  fontSize: 30, color: Colors.white, fontWeight: FontWeight.bold),
+            ),
+          ],
         ),
       ),
-      home: HomePage(),
     );
   }
 }
@@ -29,14 +63,14 @@ class HomePage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('Medify - Keeps Every Record'),
-        backgroundColor: Colors.teal, // Customize AppBar color
-        elevation: 4, // Add elevation for a shadow effect
+        backgroundColor: Colors.teal,
+        elevation: 4,
         foregroundColor: Colors.black,
       ),
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [Colors.teal[200]!, Colors.teal[400]!],
+            colors: [Colors.teal[300]!, Colors.teal[600]!],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -52,7 +86,7 @@ class HomePage extends StatelessWidget {
                   color: Colors.black.withOpacity(0.2),
                   spreadRadius: 4,
                   blurRadius: 10,
-                  offset: Offset(0, 3), // Changes position of shadow
+                  offset: Offset(0, 3),
                 ),
               ],
             ),
@@ -65,61 +99,55 @@ class HomePage extends StatelessWidget {
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 24,
-                    color: Colors.teal[700], // Customize text color
+                    color: Colors.teal[700],
                   ),
                 ),
                 SizedBox(height: 20),
-                ElevatedButton.icon(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => PatientLogin()),
-                    );
-                  },
-                  icon: Icon(Icons.person, size: 18),
-                  label: Text('Patient'),
-                  style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
+                _buildRoleButton(
+                  context,
+                  'Patient',
+                  Icons.person,
+                  PatientLogin(),
                 ),
                 SizedBox(height: 20),
-                ElevatedButton.icon(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => DoctorLoginPage()),
-                    );
-                  },
-                  icon: Icon(Icons.medical_services, size: 18),
-                  label: Text('Doctor'),
-                  style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
+                _buildRoleButton(
+                  context,
+                  'Doctor',
+                  Icons.medical_services,
+                  DoctorLoginPage(),
                 ),
                 SizedBox(height: 20),
-                ElevatedButton.icon(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => HospitalAdminLogin()),
-                    );
-                  },
-                  icon: Icon(Icons.local_hospital, size: 18),
-                  label: Text('Hospital'),
-                  style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
+                _buildRoleButton(
+                  context,
+                  'Hospital',
+                  Icons.local_hospital,
+                  HospitalAdminLogin(),
                 ),
               ],
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  ElevatedButton _buildRoleButton(
+      BuildContext context, String label, IconData icon, Widget page) {
+    return ElevatedButton.icon(
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => page),
+        );
+      },
+      icon: Icon(icon, size: 18),
+      label: Text(label),
+      style: ElevatedButton.styleFrom(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+        textStyle: TextStyle(fontSize: 18),
       ),
     );
   }
@@ -244,6 +272,7 @@ class _PatientLoginState extends State<PatientLogin> {
     );
   }
 }
+
 class PatientHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -307,7 +336,6 @@ class PatientHomePage extends StatelessWidget {
   }
 }
 
-
 class PatientProfile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -327,31 +355,31 @@ class PatientProfile extends StatelessWidget {
         child: ListView(
           padding: EdgeInsets.all(16.0),
           children: <Widget>[
-            ProfileItem(title: 'Name', value: 'John Doe'),
+            ProfileItem(title: 'Name', value: 'DIYA SOLANKI'),
             SizedBox(height: 10),
-            ProfileItem(title: 'Gender', value: 'Male'),
+            ProfileItem(title: 'Gender', value: 'Female'),
             SizedBox(height: 10),
-            ProfileItem(title: 'Date of Birth', value: '01/01/1980'),
+            ProfileItem(title: 'Date of Birth', value: '01/01/2005'),
             SizedBox(height: 10),
             ProfileItem(title: 'Phone Number', value: '1234567890'),
             SizedBox(height: 10),
-            ProfileItem(title: 'Email', value: 'john@gmail.com'),
+            ProfileItem(title: 'Email', value: 'diyas@gmail.com'),
             SizedBox(height: 10),
-            ProfileItem(title: 'Address', value: '123 Street Name, City'),
+            ProfileItem(title: 'Address', value: 'Gandhinagar, Gujrat'),
             SizedBox(height: 10),
-            ProfileItem(title: 'Marital Status', value: 'Married'),
+            ProfileItem(title: 'Marital Status', value: 'Unmarried'),
             SizedBox(height: 10),
-            ProfileItem(title: 'Is patient younger than 18?', value: 'No'),
+            ProfileItem(title: 'Is patient younger than 18?', value: 'YES'),
             SizedBox(height: 10),
-            ProfileItem(title: 'Emergency Contact Name', value: 'Jane Doe'),
+            ProfileItem(title: 'Emergency Contact Name', value: 'Tejas Patil'),
             SizedBox(height: 10),
             ProfileItem(title: 'Emergency Contact Number', value: '0987654321'),
             SizedBox(height: 10),
-            ProfileItem(title: 'Family Doctor Name', value: 'Dr. Smith'),
+            ProfileItem(title: 'Family Doctor Name', value: 'Dr. Patel'),
             SizedBox(height: 10),
             ProfileItem(title: 'Family Doctor Phone', value: '1234567890'),
             SizedBox(height: 10),
-            ProfileItem(title: 'Preferred Pharmacy', value: 'ABC Pharmacy'),
+            ProfileItem(title: 'Preferred Pharmacy', value: 'Apollo Pharmacy'),
             SizedBox(height: 10),
             ProfileItem(title: 'Preferred Pharmacy Phone', value: '0987654321'),
             SizedBox(height: 10),
@@ -455,6 +483,7 @@ class _NearbyHospitalState extends State<NearbyHospital> {
     );
   }
 }
+
 class NearbyPharmacy extends StatefulWidget {
   @override
   _NearbyPharmacyState createState() => _NearbyPharmacyState();
@@ -535,6 +564,7 @@ class _NearbyPharmacyState extends State<NearbyPharmacy> {
     );
   }
 }
+
 class ProfileItem extends StatelessWidget {
   final String title;
   final String value;
@@ -1105,8 +1135,6 @@ class DoctorLoginPage extends StatefulWidget {
   _DoctorLoginPageState createState() => _DoctorLoginPageState();
 }
 
-
-
 class _DoctorLoginPageState extends State<DoctorLoginPage> {
   final TextEditingController doctorIdController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
@@ -1219,7 +1247,6 @@ class _DoctorLoginPageState extends State<DoctorLoginPage> {
   }
 }
 
-
 class DoctorDashboardPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -1299,18 +1326,18 @@ class MyDetailsPage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Text('Name: Dr. John Doe', style: TextStyle(fontSize: 18, color: Colors.black)),
-                Text('Username: johndoe', style: TextStyle(fontSize: 18, color: Colors.black)),
-                Text('Phone No: +1234567890', style: TextStyle(fontSize: 18, color: Colors.black)),
-                Text('Email: johndoe@example.com', style: TextStyle(fontSize: 18, color: Colors.black)),
-                Text('Address: 123 Main St', style: TextStyle(fontSize: 18, color: Colors.black)),
+                Text('Name: Dr. Jampani Komal', style: TextStyle(fontSize: 18, color: Colors.black)),
+                Text('Username: komal', style: TextStyle(fontSize: 18, color: Colors.black)),
+                Text('Phone No: 1234567890', style: TextStyle(fontSize: 18, color: Colors.black)),
+                Text('Email: komal@gmail.com', style: TextStyle(fontSize: 18, color: Colors.black)),
+                Text('Address: Telengana, India', style: TextStyle(fontSize: 18, color: Colors.black)),
                 Text('Citizen ID: C123456', style: TextStyle(fontSize: 18, color: Colors.black)),
                 Text('NMC ID: NMC123456', style: TextStyle(fontSize: 18, color: Colors.black)),
                 Text('Blood Group: O+', style: TextStyle(fontSize: 18, color: Colors.black)),
                 Text('Unique ID: U123456', style: TextStyle(fontSize: 18, color: Colors.black)),
                 Text('Degree: MD', style: TextStyle(fontSize: 18, color: Colors.black)),
                 Text('Specialization: Cardiology', style: TextStyle(fontSize: 18, color: Colors.black)),
-                Text('Hospital: General Hospital', style: TextStyle(fontSize: 18, color: Colors.black)),
+                Text('Hospital: Apollo Hospital', style: TextStyle(fontSize: 18, color: Colors.black)),
               ],
             ),
           ),
@@ -1319,66 +1346,65 @@ class MyDetailsPage extends StatelessWidget {
     );
   }
 }
+
 class PatientProfileVisitPage extends StatefulWidget {
   @override
   _PatientProfileVisitPageState createState() => _PatientProfileVisitPageState();
 }
 
 class _PatientProfileVisitPageState extends State<PatientProfileVisitPage> {
-  final _documentNumberController = TextEditingController();
-  String _selectedDocumentType = 'Aadhaar Card'; // Default selection
+  final _idNumberController = TextEditingController();
+  String _selectedIdType = 'Aadhaar Card'; // Default selection
 
   // Sample data for demonstration
-  final Map<String, Map<String, Map<String, String>>> _patientData = {
-    'Aadhaar Card': {
-      '123456789012': {
-        'name': 'Jane Doe',
-        'doctorName': 'Dr. John Doe',
-        'doctorAddress': '123 Main St',
-      },
-      '234567890123': {
-        'name': 'Robert Smith',
-        'doctorName': 'Dr. Emma Watson',
-        'doctorAddress': '456 Elm St',
-      },
-      // Add more Aadhaar Card entries if needed
+  final Map<String, Map<String, String>> _patientData = {
+    '123456': {
+      'name': 'Aashutosh',
+      'doctorName': 'Dr. Komal',
+      'doctorAddress': 'Janakpur, Nepal',
     },
-    'PAN Card': {
-      'ABCDE1234F': {
-        'name': 'Alice Johnson',
-        'doctorName': 'Dr. Michael Lee',
-        'doctorAddress': '789 Maple Ave',
-      },
-      'XYZDE5678G': {
-        'name': 'David Wilson',
-        'doctorName': 'Dr. Linda Gray',
-        'doctorAddress': '101 Pine Rd',
-      },
-      // Add more PAN Card entries if needed
+    '654321': {
+      'name': 'Ashwani Gupta',
+      'doctorName': 'Dr. Patel',
+      'doctorAddress': 'UP, India',
     },
-    'Passport': {
-      'P1234567': {
-        'name': 'Emily Davis',
-        'doctorName': 'Dr. Sarah Brown',
-        'doctorAddress': '202 Birch Blvd',
-      },
-      'P7654321': {
-        'name': 'James Taylor',
-        'doctorName': 'Dr. Chris Green',
-        'doctorAddress': '303 Oak St',
-      },
-      // Add more Passport entries if needed
-    },
-    // Add more documents and patient data as needed
   };
 
-  void _retrievePatientInfo() {
-    final documentType = _selectedDocumentType;
-    final documentNumber = _documentNumberController.text;
+  // Mock function to check if doctor is authorized
+  bool _isDoctorAuthorized() {
+    // Implement your logic here to verify the doctor's authentication
+    // For example, you might check if the doctor is logged in or has valid credentials
+    return true; // Assuming the doctor is always authorized for demo purposes
+  }
 
-    // Check if the document type and number exist in the sample data
-    if (_patientData[documentType]?.containsKey(documentNumber) ?? false) {
-      final patientInfo = _patientData[documentType]![documentNumber]!; // Get patient info
+  void _retrievePatientInfo() {
+    if (!_isDoctorAuthorized()) {
+      // Show error if doctor is not authorized
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Authorization Error'),
+            content: Text('You are not authorized to access patient information.'),
+            actions: <Widget>[
+              TextButton(
+                child: Text('OK'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+      return;
+    }
+
+    final idNumber = _idNumberController.text;
+
+    // Check if the ID number exists in the sample data
+    if (_patientData.containsKey(idNumber)) {
+      final patientInfo = _patientData[idNumber]!; // Get patient info
       final patientName = patientInfo['name']!;
       final doctorName = patientInfo['doctorName']!;
       final doctorAddress = patientInfo['doctorAddress']!;
@@ -1389,7 +1415,7 @@ class _PatientProfileVisitPageState extends State<PatientProfileVisitPage> {
           return AlertDialog(
             title: Text('Confirmation'),
             content: Text('$doctorName has accessed $patientName at $doctorAddress. Do you wish to continue?',
-                style: TextStyle(color: Colors.black)),
+                style: TextStyle(fontSize: 18, color: Colors.black)),
             actions: <Widget>[
               TextButton(
                 child: Text('Cancel'),
@@ -1415,13 +1441,13 @@ class _PatientProfileVisitPageState extends State<PatientProfileVisitPage> {
         },
       );
     } else {
-      // Show error if the document number is not found
+      // Show error if the ID number is not found
       showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
             title: Text('Error'),
-            content: Text('Document number not found. Please check the number and try again.'),
+            content: Text('ID number not found. Please check the number and try again.'),
             actions: <Widget>[
               TextButton(
                 child: Text('OK'),
@@ -1449,7 +1475,7 @@ class _PatientProfileVisitPageState extends State<PatientProfileVisitPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             DropdownButtonFormField<String>(
-              value: _selectedDocumentType,
+              value: _selectedIdType,
               items: <String>['Aadhaar Card', 'PAN Card', 'Passport']
                   .map<DropdownMenuItem<String>>((String value) {
                 return DropdownMenuItem<String>(
@@ -1459,22 +1485,22 @@ class _PatientProfileVisitPageState extends State<PatientProfileVisitPage> {
               }).toList(),
               onChanged: (String? newValue) {
                 setState(() {
-                  _selectedDocumentType = newValue!;
+                  _selectedIdType = newValue!;
                 });
               },
               decoration: InputDecoration(
                 filled: true,
                 fillColor: Colors.white, // Set the background color of the dropdown to white
-                labelText: 'Select Document Type',
+                labelText: 'Select ID Type',
                 border: OutlineInputBorder(),
               ),
             ),
             SizedBox(height: 16),
             TextField(
               style: TextStyle(color: Colors.black),
-              controller: _documentNumberController,
+              controller: _idNumberController,
               decoration: InputDecoration(
-                labelText: 'Enter Document Number',
+                labelText: 'Enter ID Number',
                 filled: true,
                 fillColor: Colors.white, // Set the background color of the input box to white
                 border: OutlineInputBorder(),
@@ -1482,7 +1508,7 @@ class _PatientProfileVisitPageState extends State<PatientProfileVisitPage> {
             ),
             SizedBox(height: 20),
             ElevatedButton(
-              onPressed: _documentNumberController.text.isNotEmpty ? _retrievePatientInfo : null,
+              onPressed: _idNumberController.text.isNotEmpty ? _retrievePatientInfo : null,
               child: Text('Search'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.teal, // Customize button color
@@ -1543,7 +1569,6 @@ class PatientMedicalHistoryPage extends StatelessWidget {
   }
 }
 
-
 class ShareExperiencePage extends StatefulWidget {
   @override
   _ShareExperiencePageState createState() => _ShareExperiencePageState();
@@ -1554,15 +1579,15 @@ class _ShareExperiencePageState extends State<ShareExperiencePage> {
 
   final List<Map<String, String>> _dummyExperiences = [
     {
-      'doctor': 'Dr. John Doe',
+      'doctor': 'Dr. Boriwalli',
       'experience': 'Today, I encountered a case of rare autoimmune disorder. The patient showed symptoms that were new to me. I will be researching further to understand this better and update my treatment methods.'
     },
     {
-      'doctor': 'Dr. Jane Smith',
+      'doctor': 'Dr. Bandra',
       'experience': 'I had a patient with an unusual reaction to a common antibiotic. This is a reminder of the importance of monitoring patient responses to medication closely.'
     },
     {
-      'doctor': 'Dr. Emily Clark',
+      'doctor': 'Dr. Cannara',
       'experience': 'Recently, I treated a case of severe dehydration due to an underlying condition that was not initially diagnosed. Early intervention is key in such cases.'
     },
   ];
@@ -1626,8 +1651,8 @@ class _ShareExperiencePageState extends State<ShareExperiencePage> {
             ),
             SizedBox(height: 20),
             Text(
-              'Recent Experiences Shared by Doctors:',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold,color: Colors.black)
+                'Recent Experiences Shared by Doctors:',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold,color: Colors.black)
             ),
             SizedBox(height: 10),
             Expanded(
@@ -1974,7 +1999,6 @@ class CreateDoctorAccount extends StatelessWidget {
   }
 }
 
-
 class HospitalAdminDashboard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -2029,11 +2053,11 @@ class HospitalAdminDashboard extends StatelessWidget {
 }
 
 class HospitalDetails extends StatelessWidget {
-  final TextEditingController hospitalNameController = TextEditingController();
-  final TextEditingController addressController = TextEditingController();
-  final TextEditingController branchController = TextEditingController();
-  final TextEditingController staffCountController = TextEditingController();
-  final TextEditingController timingController = TextEditingController();
+  final String hospitalName = 'Apollo Hospital';
+  final String address = '  Gujrat, India';
+  final String branch = 'Gandhinagar';
+  final String staffCount = '150';
+  final String timing = '24/7';
 
   @override
   Widget build(BuildContext context) {
@@ -2054,69 +2078,42 @@ class HospitalDetails extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            TextField(
-              style: TextStyle(color: Colors.black),
-              controller: hospitalNameController,
-              decoration: InputDecoration(
-                labelText: 'Hospital Name',
-                filled: true,
-                fillColor: Colors.white, // Set the background color of the input box to white
-              ),
-            ),
+            _buildDetailRow('Hospital Name', hospitalName),
             SizedBox(height: 16.0),
-            TextField(
-              style: TextStyle(color: Colors.black),
-              controller: addressController,
-              decoration: InputDecoration(
-                labelText: 'Address',
-                filled: true,
-                fillColor: Colors.white, // Set the background color of the input box to white
-              ),
-            ),
+            _buildDetailRow('Address', address),
             SizedBox(height: 16.0),
-            TextField(
-              style: TextStyle(color: Colors.black),
-              controller: branchController,
-              decoration: InputDecoration(
-                labelText: 'Branch',
-                filled: true,
-                fillColor: Colors.white, // Set the background color of the input box to white
-              ),
-            ),
+            _buildDetailRow('Branch', branch),
             SizedBox(height: 16.0),
-            TextField(
-              style: TextStyle(color: Colors.black),
-              controller: staffCountController,
-              decoration: InputDecoration(
-                labelText: 'Number of People Working',
-                filled: true,
-                fillColor: Colors.white, // Set the background color of the input box to white
-              ),
-            ),
+            _buildDetailRow('Number of People Working', staffCount),
             SizedBox(height: 16.0),
-            TextField(
-              style: TextStyle(color: Colors.black),
-              controller: timingController,
-              decoration: InputDecoration(
-                labelText: 'Timing',
-                filled: true,
-                fillColor: Colors.white, // Set the background color of the input box to white
-              ),
-            ),
+            _buildDetailRow('Timing', timing),
             SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                // Handle save hospital details
-              },
-              child: Text('Save Details'),
-            ),
           ],
         ),
       ),
     );
   }
-}
 
+  Widget _buildDetailRow(String label, String value) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Expanded(
+          child: Text(
+            '$label: ',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black),
+          ),
+        ),
+        Expanded(
+          child: Text(
+            value,
+            style: TextStyle(fontSize: 18, color: Colors.black),
+          ),
+        ),
+      ],
+    );
+  }
+}
 
 // Patient Verification
 class PatientVerification extends StatelessWidget {
